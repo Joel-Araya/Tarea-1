@@ -1,11 +1,10 @@
 package socket;
-
 import javax.swing.*;
 import java.awt.*;
 
-public class InterfazGrafica extends JFrame {
+public class InterfazGraficaCliente extends JFrame {
 
-    public InterfazGrafica(){
+    public InterfazGraficaCliente(){
 
         int altura, largo;
 
@@ -20,9 +19,9 @@ public class InterfazGrafica extends JFrame {
 
         setBounds(largo/6,altura/10,largo,altura);
         setResizable(false);
-        setTitle("Tarea 1");
+        setTitle("Cliente");
 
-        Canva miCanva = new Canva();
+        CanvaCliente miCanva = new CanvaCliente();
         add(miCanva);
 
         setVisible(true);
