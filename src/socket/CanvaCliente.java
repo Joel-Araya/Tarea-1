@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.LinkedList;
 
 public class CanvaCliente extends JPanel implements Runnable {
 
@@ -16,10 +17,12 @@ public class CanvaCliente extends JPanel implements Runnable {
     private JTextField campoEscribir, Contacto;
     private JButton boton;
     int puertoInicial = 50000;
+    LinkedList Chats = new LinkedList();
+
 
     public CanvaCliente() {
 
-        JLabel texto = new JLabel("Chat --- Introduce tu Ip");   //Muestra un Label que dice que este es la ventana del chat
+        JLabel texto = new JLabel("Chat --- Introduce el puerto de contacto");
         add(texto);
 
         Contacto = new JTextField(7);
@@ -62,7 +65,7 @@ public class CanvaCliente extends JPanel implements Runnable {
                     puertoEmisor = mensajeRecibido.getIp();
                     mensaje = mensajeRecibido.getMensaje();
 
-                    areaTextoCliente.append("De " + puertoEmisor + ": " + mensaje + "\n");
+                    conversaciones(Integer.parseInt(puertoEmisor),"De " + puertoEmisor + ": " + mensaje + "\n");
 
                     socket.close();
                 }
@@ -84,7 +87,6 @@ public class CanvaCliente extends JPanel implements Runnable {
         public void actionPerformed(ActionEvent e) {
 
             int puerto = Integer.parseInt(Contacto.getText());
-
             try {
                 Socket nuevoSocket = new Socket("127.0.0.1", puerto);
 
@@ -92,7 +94,7 @@ public class CanvaCliente extends JPanel implements Runnable {
                 datosRecibidos.setIp(String.valueOf(puertoInicial));
                 datosRecibidos.setMensaje(campoEscribir.getText());
 
-                areaTextoCliente.append("Yo: " + campoEscribir.getText() + "\n");
+                conversaciones(puerto,"Yo: " + campoEscribir.getText() + "\n");
 
                 ObjectOutputStream informacionDatos = new ObjectOutputStream(nuevoSocket.getOutputStream());
                 informacionDatos.writeObject(datosRecibidos);
@@ -106,6 +108,34 @@ public class CanvaCliente extends JPanel implements Runnable {
 
             }
 
+        }
+    }
+
+    public void conversaciones(int contacto, String texto){
+        if(Chats.size() == 0){
+            Chat convo = new Chat();
+            convo.setContacto(contacto);
+            Chats.add(convo);
+            convo.conve += texto;
+            areaTextoCliente.setText(convo.getConve());
+        }
+        else{
+            boolean aux = false;
+            for(int i = 0; i < Chats.size();i++){
+                Chat tmp = (Chat) Chats.get(i);
+                if(tmp.getContacto() == contacto){
+                    tmp.conve += texto;
+                    areaTextoCliente.setText(tmp.getConve());
+                    aux = true;
+                }
+            }
+            if(!aux){
+                Chat convo = new Chat();
+                convo.setContacto(contacto);
+                Chats.add(convo);
+                convo.conve += texto;
+                areaTextoCliente.setText(convo.getConve());
+            }
         }
     }
 }
