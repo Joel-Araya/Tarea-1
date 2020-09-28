@@ -6,11 +6,10 @@ public class InterfazGraficaCliente extends JFrame {
 
     public InterfazGraficaCliente(){
 
-        int altura, largo;
-
         Toolkit pantalla = Toolkit.getDefaultToolkit();
         Dimension tamano = pantalla.getScreenSize();
 
+        int altura, largo;
         int alturaPantalla = tamano.height;
         int largoPantalla = tamano.width;
 
@@ -19,7 +18,7 @@ public class InterfazGraficaCliente extends JFrame {
 
         setBounds(largo/6,altura/10,largo,altura);
         setResizable(false);
-        setTitle("Cliente");
+        setTitle("Chat");
 
         CanvaCliente miCanva = new CanvaCliente();
         add(miCanva);
