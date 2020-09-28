@@ -2,30 +2,57 @@ package socket;
 
 import java.io.Serializable;
 
+/**
+ * Esta clase genera un mensaje que puede ser serializado y enviado a través de la red
+ */
 public class MensajeUsuario implements Serializable {
 
-    private String ip, mensaje;
+    private String puerto, mensaje;
 
+    /**
+     * Este constructor permite crear una instancia sin especificar algún parámetro
+     */
     public MensajeUsuario() {
     }
 
-    public MensajeUsuario(String ip, String mensaje) {
-        this.ip = ip;
+    /**
+     *
+     * @param puerto este parámetro debe ser un String
+     * @param mensaje este parámetro debe ser un String
+     */
+    public MensajeUsuario(String puerto, String mensaje) {
+        this.puerto = puerto;
         this.mensaje = mensaje;
     }
 
-    public String getIp() {
-        return ip;
+    /**
+     *
+     * @return puerto en String
+     */
+    public String getPuerto() {
+        return puerto;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    /**
+     *
+     * @param puerto debe ser introducido en String
+     */
+    public void setPuerto(String puerto) {
+        this.puerto = puerto;
     }
 
+    /**
+     *
+     * @return mensaje que contiene toda la conversación
+     */
     public String getMensaje() {
         return mensaje;
     }
 
+    /**
+     *
+     * @param mensaje Un parámetro de tipo String que sobreescribe el atributo mensaje
+     */
     public void setMensaje(String mensaje) {
         this.mensaje = mensaje;
     }

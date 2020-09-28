@@ -1,5 +1,8 @@
 package socket;
 
+/**
+ * Esta clase permite relacionar un número de contacto (puerto) a una conversación
+ */
 public class Chat {
 
     int contacto;
