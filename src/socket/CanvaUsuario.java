@@ -1,5 +1,8 @@
 package socket;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,13 +12,15 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.InvalidParameterException;
 import java.util.LinkedList;
 
 /**
- *Esta clase se enccarga de generar los componentes de la clase GUIWindows y los sockets de servidor y cliente de cada usuario
+ * Esta clase se enccarga de generar los componentes de la clase GUIWindows y los sockets de servidor y cliente de cada usuario
  */
 
 public class CanvaUsuario extends JPanel implements Runnable {
+    private static Logger log = LoggerFactory.getLogger(CanvaUsuario.class);
 
     private JTextArea areaTextoCliente;
     private JTextField campoEscribir, Contacto;
@@ -25,6 +30,7 @@ public class CanvaUsuario extends JPanel implements Runnable {
 
 
     public CanvaUsuario() {
+        log.debug("Se inicio");
 
         JLabel texto = new JLabel("Chat --- Introduce el puerto de contacto");
         add(texto);
@@ -58,11 +64,12 @@ public class CanvaUsuario extends JPanel implements Runnable {
      * Esta clase inicia un serverSocket que permite utilizar su puerto como número de contacto
      */
     @Override
-    public void run(){
+    public void run() {
         boolean flag = true;
         //Se crea un bucle que intente iniciar un serverSocket en puertos consecutivos hasta encontrar uno con espacio disponible
         while (flag) {
             try {
+                log.debug("Se intentó crear un socketserver");
                 ServerSocket servidor = new ServerSocket(puertoInicial);
                 String puertoEmisor, mensaje;
                 MensajeUsuario mensajeRecibido;
@@ -71,9 +78,10 @@ public class CanvaUsuario extends JPanel implements Runnable {
                 flag = false;
 
                 //Se informa del puerto en el que se alojó el ServerSocket mediante la consola
-                System.out.println("===============");
-                System.out.println(puertoInicial);
-                System.out.println("===============");
+                //System.out.println("===============");
+                //System.out.println(puertoInicial);
+                //System.out.println("===============");
+                log.debug("Se alojó un serversocket en el puerto " + puertoInicial);
 
                 //Se inicia un bucle que acepte las conexiones de otros Sockets y muestre sus mensajes
                 while (true) {
@@ -84,19 +92,23 @@ public class CanvaUsuario extends JPanel implements Runnable {
                     puertoEmisor = mensajeRecibido.getPuerto();
                     mensaje = mensajeRecibido.getMensaje();
 
-                    conversaciones(Integer.parseInt(puertoEmisor),"De " + puertoEmisor + ": " + mensaje + "\n");
+                    conversaciones(Integer.parseInt(puertoEmisor), "De " + puertoEmisor + ": " + mensaje + "\n");
 
                     socket.close();
                 }
             } catch (UnknownHostException unknownHostException) {
-                unknownHostException.printStackTrace();
-                System.out.println("UnknownHostException cliente");
+                //unknownHostException.printStackTrace();
+                //System.out.println("UnknownHostException cliente");
+                log.error(unknownHostException.getMessage(), unknownHostException);
+
             } catch (IOException ioException) {
                 //ioException.printStackTrace();
-                System.out.println("IOException cliente");
+                //System.out.println("IOException cliente");
+                log.error(ioException.getMessage(), ioException);
                 puertoInicial++;
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
+                log.error(e.getMessage(), e);
             }
         }
     }
@@ -107,18 +119,20 @@ public class CanvaUsuario extends JPanel implements Runnable {
     private class TextoEnviado implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-            //Se guarda el valor del puerto especificado en un int
-            int puerto = Integer.parseInt(Contacto.getText());
+
             try {
+                //Se guarda el valor del puerto especificado en un int
+                int puerto = Integer.parseInt(Convertir.conversionTexto(Contacto));
+
                 //Se crea un nuevo socket para enviar la información
                 Socket nuevoSocket = new Socket("127.0.0.1", puerto);
 
                 //Obtiene los datos que son recibidos de la GUI para enviarlo al contacto espcíficado
                 MensajeUsuario datosRecibidos = new MensajeUsuario();
                 datosRecibidos.setPuerto(String.valueOf(puertoInicial));
-                datosRecibidos.setMensaje(campoEscribir.getText());
+                datosRecibidos.setMensaje(Convertir.getMessage(campoEscribir));
 
-                conversaciones(puerto,"Yo: " + campoEscribir.getText() + "\n");
+                conversaciones(puerto, "Yo: " + campoEscribir.getText() + "\n");
 
                 //Se crea un flujo de datos de salida para enviar los datos recibidos
                 ObjectOutputStream informacionDatos = new ObjectOutputStream(nuevoSocket.getOutputStream());
@@ -126,11 +140,14 @@ public class CanvaUsuario extends JPanel implements Runnable {
                 nuevoSocket.close();
 
             } catch (UnknownHostException unknownHostException) {
-                unknownHostException.printStackTrace();
-                System.out.println("UnknownHostException cliente");
+                //unknownHostException.printStackTrace();
+                //System.out.println("UnknownHostException cliente");
+                log.error(unknownHostException.getMessage(), unknownHostException);
             } catch (IOException ioException) {
-                System.out.println("IOException cliente");
-
+                //System.out.println("IOException cliente");
+                log.error(ioException.getMessage(), ioException);
+            } catch (IllegalArgumentException ex){
+                log.error(ex.getMessage(), ex);
             }
 
         }
@@ -138,29 +155,29 @@ public class CanvaUsuario extends JPanel implements Runnable {
 
     /**
      * Este método se encarga de filtrar los mensajes de acuerdo a la conversación en la que se encuentre el usuario
+     *
      * @param contacto Se utiliza para filtrar los mensajes
-     * @param texto Contiene los mensajes de la conversación respectiva
+     * @param texto    Contiene los mensajes de la conversación respectiva
      */
-    public void conversaciones(int contacto, String texto){
+    public void conversaciones(int contacto, String texto) {
         //Guarda un nuevo contacto en una LinkedList en caso de que no existan
-        if(Chats.size() == 0){
+        if (Chats.size() == 0) {
             Chat convo = new Chat();
             convo.setContacto(contacto);
             Chats.add(convo);
             convo.conve += texto;
             areaTextoCliente.setText(convo.getConve());
-        }
-        else{
+        } else {
             boolean aux = false;
-            for(int i = 0; i < Chats.size();i++){
+            for (int i = 0; i < Chats.size(); i++) {
                 Chat tmp = (Chat) Chats.get(i);
-                if(tmp.getContacto() == contacto){
+                if (tmp.getContacto() == contacto) {
                     tmp.conve += texto;
                     areaTextoCliente.setText(tmp.getConve());
                     aux = true;
                 }
             }
-            if(!aux){
+            if (!aux) {
                 Chat convo = new Chat();
                 convo.setContacto(contacto);
                 Chats.add(convo);
@@ -170,3 +187,4 @@ public class CanvaUsuario extends JPanel implements Runnable {
         }
     }
 }
+

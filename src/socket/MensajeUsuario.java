@@ -1,11 +1,15 @@
 package socket;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Serializable;
 
 /**
  * Esta clase genera un mensaje que puede ser serializado y enviado a través de la red
  */
 public class MensajeUsuario implements Serializable {
+    private static Logger log = LoggerFactory.getLogger(MensajeUsuario.class);
 
     private String puerto, mensaje;
 
@@ -25,34 +29,18 @@ public class MensajeUsuario implements Serializable {
         this.mensaje = mensaje;
     }
 
-    /**
-     *
-     * @return puerto en String
-     */
     public String getPuerto() {
         return puerto;
     }
 
-    /**
-     *
-     * @param puerto debe ser introducido en String
-     */
     public void setPuerto(String puerto) {
         this.puerto = puerto;
     }
 
-    /**
-     *
-     * @return mensaje que contiene toda la conversación
-     */
     public String getMensaje() {
         return mensaje;
     }
 
-    /**
-     *
-     * @param mensaje Un parámetro de tipo String que sobreescribe el atributo mensaje
-     */
     public void setMensaje(String mensaje) {
         this.mensaje = mensaje;
     }

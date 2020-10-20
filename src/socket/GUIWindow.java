@@ -1,4 +1,7 @@
 package socket;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -6,6 +9,7 @@ import java.awt.*;
  * Esta clase genera la ventana de la interfaz gráfica de la aplicación adaptada a la resolución de pantalla del usuario
  */
 public class GUIWindow extends JFrame {
+    private static Logger log = LoggerFactory.getLogger(GUIWindow.class);
 
     public GUIWindow(){
         //Se obtienen las dimensiones de la pantalla
